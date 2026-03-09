@@ -44,7 +44,7 @@ const EditQuiz = () => {
 
         const quiz = quizRes.data;
         if (quiz.created_by !== user?.id) {
-          navigate("/");
+          navigate("/dashboard");
           return;
         }
 
@@ -64,7 +64,7 @@ const EditQuiz = () => {
         );
       } catch {
         toast.error("Failed to load quiz");
-        navigate("/");
+        navigate("/dashboard");
       } finally {
         setLoading(false);
       }
@@ -84,7 +84,7 @@ const EditQuiz = () => {
     );
   }
 
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -154,7 +154,7 @@ const EditQuiz = () => {
       if (insertErr) throw insertErr;
 
       toast.success("Quiz updated successfully!");
-      navigate("/");
+      navigate("/dashboard");
     } catch {
       toast.error("Failed to update quiz");
     } finally {
@@ -166,7 +166,7 @@ const EditQuiz = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="mb-4 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4 gap-1">
           <ArrowLeft className="h-4 w-4" /> Back to Dashboard
         </Button>
 

@@ -95,7 +95,7 @@ const AdminQuizResults = () => {
   }, [id]);
 
   if (authLoading) return null;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   if (loading) {
     return (
@@ -108,7 +108,7 @@ const AdminQuizResults = () => {
     );
   }
 
-  if (!quiz) return <Navigate to="/" replace />;
+  if (!quiz) return <Navigate to="/dashboard" replace />;
 
   const avgScore = attempts.length
     ? Math.round(attempts.reduce((s, a) => s + a.score, 0) / attempts.length)
@@ -122,7 +122,7 @@ const AdminQuizResults = () => {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8">
         <Button variant="ghost" size="sm" asChild className="mb-4 gap-1">
-          <Link to="/"><ArrowLeft className="h-4 w-4" /> Back to Dashboard</Link>
+          <Link to="/dashboard"><ArrowLeft className="h-4 w-4" /> Back to Dashboard</Link>
         </Button>
 
         {/* Quiz Header */}

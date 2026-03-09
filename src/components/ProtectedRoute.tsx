@@ -14,12 +14,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // User is logged in but hasn't selected a role yet
   if (!role) {
-    return <Navigate to="/select-role" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

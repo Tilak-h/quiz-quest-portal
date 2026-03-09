@@ -12,7 +12,7 @@ export const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
         <div className="flex items-center gap-4">
-          <Link to="/" className="font-heading text-xl font-bold text-foreground">
+          <Link to="/dashboard" className="font-heading text-xl font-bold text-foreground">
             QuizFlow
           </Link>
           <div className="hidden sm:flex items-center gap-1">

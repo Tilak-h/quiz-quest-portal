@@ -46,7 +46,7 @@ const AdminPage = () => {
   const [copied, setCopied] = useState(false);
 
   if (loading) return null;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -160,7 +160,7 @@ const AdminPage = () => {
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={() => navigate("/")}>
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
                 Go to Dashboard
               </Button>
               <Button onClick={() => {
