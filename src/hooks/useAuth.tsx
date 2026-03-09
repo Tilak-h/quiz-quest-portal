@@ -57,8 +57,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const roles = roleRes.data as { role: string }[] | null;
       console.log("[useAuth] fetchUserData roles:", roles);
       if (roles && roles.length > 0) {
-        const adminRole = roles.find(r => r.role === "admin");
-        const finalRole = (adminRole?.role ?? roles[0].role) as UserRole;
+        // Check if user selected a specific role on the role selection page
+        const activeRole = sessionStorage.getItem("active_role") as UserRole;
+        const hasActiveRole = activeRole && roles.some(r => r.role === activeRole);
+        
+        let finalRole: UserRole;
+        if (hasActiveRole) {
+          finalRole = activeRole;
+        } else {
+          // Default to first role found
+          finalRole = roles[0].role as UserRole;
+        }
         console.log("[useAuth] setting role:", finalRole);
         setRole(finalRole);
       } else {
