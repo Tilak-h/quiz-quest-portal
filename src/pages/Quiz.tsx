@@ -185,9 +185,15 @@ const QuizPage = () => {
         {/* Question */}
         <Card>
           <CardHeader>
-            <p className="text-xs text-muted-foreground">
-              Question {currentIndex + 1} of {questions.length}
-            </p>
+            <div className="flex items-start justify-between">
+              <p className="text-xs text-muted-foreground">
+                Question {currentIndex + 1} of {questions.length}
+              </p>
+              <QuizHintButton
+                questionText={currentQuestion.question_text}
+                options={currentQuestion.options}
+              />
+            </div>
             <CardTitle className="font-heading text-xl leading-relaxed">
               {currentQuestion.question_text}
             </CardTitle>
