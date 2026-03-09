@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Clock, PlayCircle, Loader2, Trophy, Search, BookOpen } from "lucide-react";
+import { Clock, PlayCircle, Loader2, Trophy, Search, BookOpen, KeyRound } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Quiz {
   id: string;
@@ -17,6 +18,7 @@ interface Quiz {
   description: string | null;
   time_limit: number;
   category: string | null;
+  join_code: string | null;
   created_at: string;
 }
 
@@ -27,29 +29,47 @@ interface Attempt {
   submitted_at: string;
 }
 
-const CATEGORIES = ["All", "General", "Science", "Math", "History", "Technology", "Language", "Art"];
-
 const Dashboard = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [joinCode, setJoinCode] = useState("");
+  const [joining, setJoining] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [quizRes, attemptRes] = await Promise.all([
-          supabase.from("quizzes").select("*").order("created_at", { ascending: false }),
-          supabase.from("attempts").select("*").eq("user_id", user!.id).order("submitted_at", { ascending: false }),
-        ]);
+        if (isAdmin) {
+          // Admin sees their own quizzes
+          const { data, error } = await supabase
+            .from("quizzes")
+            .select("*")
+            .eq("created_by", user!.id)
+            .order("created_at", { ascending: false });
+          if (error) throw error;
+          setQuizzes(data);
+        } else {
+          // Student sees quizzes they've attempted
+          const { data: attemptData, error: attemptErr } = await supabase
+            .from("attempts")
+            .select("*")
+            .eq("user_id", user!.id)
+            .order("submitted_at", { ascending: false });
+          if (attemptErr) throw attemptErr;
+          setAttempts(attemptData);
 
-        if (quizRes.error) throw quizRes.error;
-        if (attemptRes.error) throw attemptRes.error;
-
-        setQuizzes(quizRes.data);
-        setAttempts(attemptRes.data);
+          const quizIds = [...new Set(attemptData.map((a) => a.quiz_id))];
+          if (quizIds.length > 0) {
+            const { data: quizData, error: quizErr } = await supabase
+              .from("quizzes")
+              .select("*")
+              .in("id", quizIds);
+            if (quizErr) throw quizErr;
+            setQuizzes(quizData);
+          }
+        }
       } catch {
         toast.error("Failed to load data");
       } finally {
@@ -58,23 +78,36 @@ const Dashboard = () => {
     };
 
     if (user) fetchData();
-  }, [user]);
+  }, [user, isAdmin]);
+
+  const handleJoinQuiz = async () => {
+    if (!joinCode.trim()) {
+      toast.error("Please enter a quiz code");
+      return;
+    }
+    setJoining(true);
+    try {
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("id")
+        .eq("join_code", joinCode.trim().toUpperCase())
+        .single();
+
+      if (error || !data) {
+        toast.error("Invalid quiz code. Please check and try again.");
+        return;
+      }
+
+      navigate(`/quiz/${data.id}`);
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setJoining(false);
+    }
+  };
 
   const getAttemptForQuiz = (quizId: string) =>
     attempts.find((a) => a.quiz_id === quizId);
-
-  const filteredQuizzes = quizzes.filter((quiz) => {
-    const matchesSearch =
-      quiz.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (quiz.description ?? "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || (quiz.category ?? "General") === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const categories = CATEGORIES.filter(
-    (cat) => cat === "All" || quizzes.some((q) => (q.category ?? "General") === cat)
-  );
 
   if (loading) {
     return (
@@ -103,101 +136,99 @@ const Dashboard = () => {
             <h2 className="font-heading text-xl font-semibold text-foreground">
               {profile?.name ?? "User"}
             </h2>
-            <p className="text-sm text-muted-foreground">{profile?.email}</p>
-          </div>
-        </div>
-
-        {/* Search & Filter */}
-        <div className="mb-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search quizzes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <Button
-                key={cat}
-                variant={selectedCategory === cat ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(cat)}
-                className="rounded-full"
-              >
-                {cat}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Quizzes */}
-        <h3 className="mb-6 font-heading text-2xl font-bold text-foreground">
-          Available Quizzes
-        </h3>
-
-        {filteredQuizzes.length === 0 ? (
-          <div className="rounded-xl border bg-card p-12 text-center">
-            <p className="text-muted-foreground">
-              {quizzes.length === 0 ? "No quizzes available yet." : "No quizzes match your search."}
+            <p className="text-sm text-muted-foreground">
+              {profile?.email} · <Badge variant="secondary">{isAdmin ? "Admin" : "Student"}</Badge>
             </p>
           </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredQuizzes.map((quiz) => {
-              const attempt = getAttemptForQuiz(quiz.id);
-              return (
-                <Card key={quiz.id} className="flex flex-col">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="font-heading text-lg">{quiz.title}</CardTitle>
-                      <Badge variant="secondary" className="shrink-0 text-xs">
-                        {quiz.category ?? "General"}
-                      </Badge>
-                    </div>
-                    <CardDescription className="line-clamp-2">
-                      {quiz.description ?? "No description"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      <span>{quiz.time_limit} minutes</span>
-                    </div>
-                    {attempt && (
-                      <div className="mt-2 flex items-center gap-2 text-sm text-primary">
-                        <Trophy className="h-4 w-4" />
-                        <span>Score: {attempt.score}%</span>
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="gap-2">
-                    <Button asChild className="flex-1 gap-2">
-                      <Link to={`/quiz/${quiz.id}`}>
-                        <PlayCircle className="h-4 w-4" />
-                        {attempt ? "Retake" : "Start"}
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="gap-2">
-                      <Link to={`/practice/${quiz.id}`}>
-                        <BookOpen className="h-4 w-4" />
-                        Practice
-                      </Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })}
-          </div>
+        </div>
+
+        {/* Student: Join Quiz by Code */}
+        {!isAdmin && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="font-heading flex items-center gap-2">
+                <KeyRound className="h-5 w-5" />
+                Join a Quiz
+              </CardTitle>
+              <CardDescription>Enter the unique code shared by your teacher</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Enter quiz code (e.g. ABC123)"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && handleJoinQuiz()}
+                  className="font-mono text-lg tracking-widest uppercase"
+                  maxLength={8}
+                />
+                <Button onClick={handleJoinQuiz} disabled={joining} className="gap-2 shrink-0">
+                  {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlayCircle className="h-4 w-4" />}
+                  Join
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Previous Attempts */}
-        {attempts.length > 0 && (
-          <div className="mt-12">
+        {/* Admin: My Quizzes */}
+        {isAdmin && (
+          <>
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="font-heading text-2xl font-bold text-foreground">My Quizzes</h3>
+              <Button asChild>
+                <Link to="/admin">+ Create Quiz</Link>
+              </Button>
+            </div>
+
+            {quizzes.length === 0 ? (
+              <div className="rounded-xl border bg-card p-12 text-center">
+                <p className="text-muted-foreground">
+                  You haven't created any quizzes yet.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link to="/admin">Create your first quiz</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {quizzes.map((quiz) => (
+                  <Card key={quiz.id} className="flex flex-col">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="font-heading text-lg">{quiz.title}</CardTitle>
+                        <Badge variant="secondary" className="shrink-0 text-xs">
+                          {quiz.category ?? "General"}
+                        </Badge>
+                      </div>
+                      <CardDescription className="line-clamp-2">
+                        {quiz.description ?? "No description"}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{quiz.time_limit} minutes</span>
+                      </div>
+                      {quiz.join_code && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Code:</span>
+                          <Badge variant="outline" className="font-mono tracking-widest">
+                            {quiz.join_code}
+                          </Badge>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Student: Previous Attempts */}
+        {!isAdmin && attempts.length > 0 && (
+          <div className="mt-4">
             <h3 className="mb-4 font-heading text-2xl font-bold text-foreground">
               Your Attempts
             </h3>
@@ -229,6 +260,14 @@ const Dashboard = () => {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {!isAdmin && attempts.length === 0 && (
+          <div className="rounded-xl border bg-card p-12 text-center">
+            <p className="text-muted-foreground">
+              No quiz attempts yet. Enter a quiz code above to get started!
+            </p>
           </div>
         )}
       </main>

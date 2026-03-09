@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
+import RoleSelection from "./pages/RoleSelection";
 import Dashboard from "./pages/Dashboard";
 import QuizPage from "./pages/Quiz";
 import PracticePage from "./pages/Practice";
@@ -28,6 +29,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/select-role" element={<RoleSelection />} />
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/quiz/:id" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
               <Route path="/practice/:id" element={<ProtectedRoute><PracticePage /></ProtectedRoute>} />
