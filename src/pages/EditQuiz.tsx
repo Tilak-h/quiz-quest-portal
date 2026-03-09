@@ -154,7 +154,7 @@ const EditQuiz = () => {
       if (insertErr) throw insertErr;
 
       toast.success("Quiz updated successfully!");
-      navigate("/");
+      navigate("/dashboard");
     } catch {
       toast.error("Failed to update quiz");
     } finally {
