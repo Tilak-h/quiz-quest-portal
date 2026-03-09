@@ -6,8 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Login from "./pages/Login";
 import RoleSelection from "./pages/RoleSelection";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import QuizPage from "./pages/Quiz";
 import PracticePage from "./pages/Practice";
@@ -30,9 +30,12 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<RoleSelection />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/select-role" element={<RoleSelection />} />
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
+              {/* Protected routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/quiz/:id" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
               <Route path="/practice/:id" element={<ProtectedRoute><PracticePage /></ProtectedRoute>} />
               <Route path="/result/:id" element={<ProtectedRoute><ResultPage /></ProtectedRoute>} />
