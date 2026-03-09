@@ -31,7 +31,19 @@ export const Navbar = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              sessionStorage.setItem("switching_role", "true");
+              window.location.href = "/";
+            }}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{isAdmin ? "Admin" : "Student"}</span>
+          </Button>
           {isAdmin && (
             <Button variant="ghost" size="sm" asChild>
               <Link to="/admin" className="flex items-center gap-1.5">
