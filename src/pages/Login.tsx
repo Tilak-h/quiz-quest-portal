@@ -39,6 +39,7 @@ const Login = () => {
           if (error && error.code !== "23505") throw error;
 
           sessionStorage.removeItem("pending_role");
+          sessionStorage.setItem("active_role", pendingRole);
           toast.success(`Signed in as ${pendingRole === "admin" ? "Admin" : "Student"}`);
           window.location.href = "/dashboard";
         } catch {

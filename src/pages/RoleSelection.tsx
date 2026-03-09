@@ -33,6 +33,7 @@ const RoleSelection = () => {
   const handleSelectRole = (selectedRole: "admin" | "user") => {
     setSelected(true);
     sessionStorage.setItem("pending_role", selectedRole);
+    sessionStorage.setItem("active_role", selectedRole);
     navigate("/login");
   };
 
