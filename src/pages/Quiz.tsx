@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { QuizHintButton } from "@/components/QuizHintButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
@@ -184,9 +185,15 @@ const QuizPage = () => {
         {/* Question */}
         <Card>
           <CardHeader>
-            <p className="text-xs text-muted-foreground">
-              Question {currentIndex + 1} of {questions.length}
-            </p>
+            <div className="flex items-start justify-between">
+              <p className="text-xs text-muted-foreground">
+                Question {currentIndex + 1} of {questions.length}
+              </p>
+              <QuizHintButton
+                questionText={currentQuestion.question_text}
+                options={currentQuestion.options}
+              />
+            </div>
             <CardTitle className="font-heading text-xl leading-relaxed">
               {currentQuestion.question_text}
             </CardTitle>
