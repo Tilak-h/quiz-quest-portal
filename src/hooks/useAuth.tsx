@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = useCallback(async (userId: string) => {
     try {
       const [profileRes, roleRes] = await Promise.all([
         supabase
@@ -63,8 +63,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       setProfile(null);
       setRole(null);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -73,12 +75,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          // Keep loading true until fetchUserData completes
           setTimeout(() => fetchUserData(session.user.id), 0);
         } else {
           setProfile(null);
           setRole(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
@@ -87,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchUserData]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
