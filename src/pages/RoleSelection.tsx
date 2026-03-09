@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,19 +9,16 @@ const RoleSelection = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(false);
 
-  // If already logged in with a role, go to dashboard
-  if (!loading && session && role) {
-    navigate("/dashboard", { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (loading) return;
+    if (session && role) {
+      navigate("/dashboard", { replace: true });
+    } else if (session && !role) {
+      navigate("/login", { replace: true });
+    }
+  }, [loading, session, role, navigate]);
 
-  // If logged in but no role, go to login to assign pending role
-  if (!loading && session && !role) {
-    navigate("/login", { replace: true });
-    return null;
-  }
-
-  if (loading) {
+  if (loading || session) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
