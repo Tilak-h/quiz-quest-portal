@@ -64,7 +64,7 @@ const EditQuiz = () => {
         );
       } catch {
         toast.error("Failed to load quiz");
-        navigate("/");
+        navigate("/dashboard");
       } finally {
         setLoading(false);
       }
