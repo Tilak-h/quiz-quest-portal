@@ -235,7 +235,7 @@ const PracticePage = () => {
               </Button>
             )}
             {revealed && isComplete && (
-              <Button onClick={() => navigate("/")} variant="outline" className="gap-1">
+              <Button onClick={() => navigate("/dashboard")} variant="outline" className="gap-1">
                 <ArrowLeft className="h-4 w-4" /> Back to Dashboard
               </Button>
             )}
