@@ -50,13 +50,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", userId)
-          .maybeSingle(),
+          .eq("user_id", userId),
       ]);
 
       setProfile(profileRes.data);
-      if (roleRes.data) {
-        setRole(roleRes.data.role as UserRole);
+      const roles = roleRes.data as { role: string }[] | null;
+      if (roles && roles.length > 0) {
+        // Prefer admin role if user has multiple
+        const adminRole = roles.find(r => r.role === "admin");
+        setRole((adminRole?.role ?? roles[0].role) as UserRole);
       } else {
         setRole(null);
       }
