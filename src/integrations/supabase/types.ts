@@ -118,6 +118,7 @@ export type Database = {
           created_by: string
           description: string | null
           id: string
+          join_code: string | null
           time_limit: number
           title: string
         }
@@ -127,6 +128,7 @@ export type Database = {
           created_by: string
           description?: string | null
           id?: string
+          join_code?: string | null
           time_limit?: number
           title: string
         }
@@ -136,6 +138,7 @@ export type Database = {
           created_by?: string
           description?: string | null
           id?: string
+          join_code?: string | null
           time_limit?: number
           title?: string
         }
