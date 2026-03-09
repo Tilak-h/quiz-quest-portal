@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Clock, PlayCircle, Loader2, Trophy, Search, BookOpen, KeyRound, Users } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Clock, PlayCircle, Loader2, Trophy, Search, BookOpen, KeyRound, Users, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -109,6 +110,18 @@ const Dashboard = () => {
   const getAttemptForQuiz = (quizId: string) =>
     attempts.find((a) => a.quiz_id === quizId);
 
+  const handleDeleteQuiz = async (quizId: string) => {
+    try {
+      // Delete questions first, then the quiz
+      await supabase.from("questions").delete().eq("quiz_id", quizId);
+      const { error } = await supabase.from("quizzes").delete().eq("id", quizId);
+      if (error) throw error;
+      setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
+      toast.success("Quiz deleted successfully");
+    } catch {
+      toast.error("Failed to delete quiz");
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -219,12 +232,41 @@ const Dashboard = () => {
                         </div>
                       )}
                     </CardContent>
-                    <CardFooter>
-                      <Button variant="outline" size="sm" asChild className="w-full gap-2">
+                    <CardFooter className="flex gap-2">
+                      <Button variant="outline" size="sm" asChild className="flex-1 gap-1">
                         <Link to={`/admin/quiz/${quiz.id}`}>
-                          <Users className="h-4 w-4" /> View Results
+                          <Users className="h-4 w-4" /> Results
                         </Link>
                       </Button>
+                      <Button variant="outline" size="sm" asChild className="gap-1">
+                        <Link to={`/admin/edit/${quiz.id}`}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete "{quiz.title}"?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the quiz and all its questions. Student attempts will remain but won't be linked to this quiz. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteQuiz(quiz.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </CardFooter>
                   </Card>
                 ))}

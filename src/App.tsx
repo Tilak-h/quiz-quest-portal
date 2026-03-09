@@ -14,6 +14,7 @@ import PracticePage from "./pages/Practice";
 import ResultPage from "./pages/Result";
 import AdminPage from "./pages/Admin";
 import AdminQuizResults from "./pages/AdminQuizResults";
+import EditQuiz from "./pages/EditQuiz";
 import Leaderboard from "./pages/Leaderboard";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/result/:id" element={<ProtectedRoute><ResultPage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
               <Route path="/admin/quiz/:id" element={<ProtectedRoute><AdminQuizResults /></ProtectedRoute>} />
+              <Route path="/admin/edit/:id" element={<ProtectedRoute><EditQuiz /></ProtectedRoute>} />
               <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
               <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
