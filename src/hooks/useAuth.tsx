@@ -55,11 +55,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setProfile(profileRes.data);
       const roles = roleRes.data as { role: string }[] | null;
+      console.log("[useAuth] fetchUserData roles:", roles);
       if (roles && roles.length > 0) {
-        // Prefer admin role if user has multiple
         const adminRole = roles.find(r => r.role === "admin");
-        setRole((adminRole?.role ?? roles[0].role) as UserRole);
+        const finalRole = (adminRole?.role ?? roles[0].role) as UserRole;
+        console.log("[useAuth] setting role:", finalRole);
+        setRole(finalRole);
       } else {
+        console.log("[useAuth] no roles found");
         setRole(null);
       }
     } catch {
