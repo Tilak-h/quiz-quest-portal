@@ -108,7 +108,7 @@ const AdminQuizResults = () => {
     );
   }
 
-  if (!quiz) return <Navigate to="/" replace />;
+  if (!quiz) return <Navigate to="/dashboard" replace />;
 
   const avgScore = attempts.length
     ? Math.round(attempts.reduce((s, a) => s + a.score, 0) / attempts.length)
