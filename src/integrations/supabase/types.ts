@@ -113,6 +113,7 @@ export type Database = {
       }
       quizzes: {
         Row: {
+          category: string | null
           created_at: string
           created_by: string
           description: string | null
@@ -121,6 +122,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -129,6 +131,7 @@ export type Database = {
           title: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
@@ -158,7 +161,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard: {
+        Row: {
+          quiz_category: string | null
+          quiz_id: string | null
+          quiz_title: string | null
+          score: number | null
+          submitted_at: string | null
+          user_id: string | null
+          user_name: string | null
+          user_photo: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {

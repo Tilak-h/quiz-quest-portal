@@ -9,8 +9,11 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import QuizPage from "./pages/Quiz";
+import PracticePage from "./pages/Practice";
 import ResultPage from "./pages/Result";
 import AdminPage from "./pages/Admin";
+import Leaderboard from "./pages/Leaderboard";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,8 +30,11 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/quiz/:id" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+              <Route path="/practice/:id" element={<ProtectedRoute><PracticePage /></ProtectedRoute>} />
               <Route path="/result/:id" element={<ProtectedRoute><ResultPage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+              <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

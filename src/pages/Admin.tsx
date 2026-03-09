@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ const AdminPage = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("General");
   const [timeLimit, setTimeLimit] = useState(10);
   const [questions, setQuestions] = useState<QuestionForm[]>([
     { question_text: "", options: ["", "", "", ""], correct_answer_index: 0 },
@@ -79,6 +81,7 @@ const AdminPage = () => {
         .insert({
           title,
           description,
+          category,
           time_limit: timeLimit,
           created_by: user!.id,
         })
@@ -139,6 +142,19 @@ const AdminPage = () => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter quiz description"
                 />
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["General", "Science", "Math", "History", "Technology", "Language", "Art"].map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="time">Time Limit (minutes)</Label>

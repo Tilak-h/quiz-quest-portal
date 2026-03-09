@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Shield } from "lucide-react";
+import { LogOut, Shield, Trophy, BarChart3 } from "lucide-react";
 
 export const Navbar = () => {
   const { profile, isAdmin, signOut } = useAuth();
@@ -11,9 +11,25 @@ export const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        <Link to="/" className="font-heading text-xl font-bold text-foreground">
-          QuizFlow
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/" className="font-heading text-xl font-bold text-foreground">
+            QuizFlow
+          </Link>
+          <div className="hidden sm:flex items-center gap-1">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/leaderboard" className="flex items-center gap-1.5">
+                <Trophy className="h-4 w-4" />
+                Leaderboard
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/analytics" className="flex items-center gap-1.5">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </Link>
+            </Button>
+          </div>
+        </div>
 
         <div className="flex items-center gap-3">
           {isAdmin && (
