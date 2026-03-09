@@ -143,6 +143,19 @@ const AdminPage = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="category">Category</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["General", "Science", "Math", "History", "Technology", "Language", "Art"].map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label htmlFor="time">Time Limit (minutes)</Label>
                 <Input
                   id="time"
