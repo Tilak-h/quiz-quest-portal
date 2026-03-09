@@ -84,7 +84,7 @@ const EditQuiz = () => {
     );
   }
 
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const addQuestion = () => {
     setQuestions((prev) => [
