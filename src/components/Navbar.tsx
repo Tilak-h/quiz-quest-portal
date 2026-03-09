@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Shield, Trophy, BarChart3, ArrowLeftRight } from "lucide-react";
 
 export const Navbar = () => {
-  const { profile, isAdmin, signOut } = useAuth();
+  const { profile, isAdmin, signOut, role } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
