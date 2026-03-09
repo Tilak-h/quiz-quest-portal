@@ -16,7 +16,8 @@ const RoleSelection = () => {
     } else if (session && !role) {
       navigate("/login", { replace: true });
     }
-  }, [loading, session, role, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, session, role]);
 
   if (loading || session) {
     return (
