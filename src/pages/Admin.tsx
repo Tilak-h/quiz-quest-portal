@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Loader2, Save } from "lucide-react";
+import { AIQuizGenerator } from "@/components/AIQuizGenerator";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
 
