@@ -26,6 +26,7 @@ const AdminPage = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("General");
   const [timeLimit, setTimeLimit] = useState(10);
   const [questions, setQuestions] = useState<QuestionForm[]>([
     { question_text: "", options: ["", "", "", ""], correct_answer_index: 0 },
