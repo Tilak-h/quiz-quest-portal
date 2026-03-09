@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Shield, Trophy, BarChart3 } from "lucide-react";
+import { LogOut, Shield, Trophy, BarChart3, ArrowLeftRight } from "lucide-react";
 
 export const Navbar = () => {
   const { profile, isAdmin, signOut } = useAuth();
