@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,28 +8,49 @@ import { Shield, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const RoleSelection = () => {
-  const { user } = useAuth();
+  const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const [selecting, setSelecting] = useState(false);
 
-  const selectRole = async (role: "admin" | "user") => {
+  // Redirect if user already has a role
+  useEffect(() => {
+    if (!loading && role) {
+      navigate("/", { replace: true });
+    }
+  }, [loading, role, navigate]);
+
+  const selectRole = async (selectedRole: "admin" | "user") => {
     if (!user) return;
     setSelecting(true);
     try {
       const { error } = await supabase
         .from("user_roles")
-        .insert({ user_id: user.id, role });
+        .insert({ user_id: user.id, role: selectedRole });
 
-      if (error) throw error;
+      if (error) {
+        // Handle duplicate - user already has a role
+        if (error.code === "23505") {
+          window.location.href = "/";
+          return;
+        }
+        throw error;
+      }
 
-      toast.success(`You're now signed in as ${role === "admin" ? "an Admin" : "a User"}`);
-      // Force a full reload to re-fetch role data
+      toast.success(`You're now signed in as ${selectedRole === "admin" ? "an Admin" : "a User"}`);
       window.location.href = "/";
     } catch {
       toast.error("Failed to set role. Please try again.");
       setSelecting(false);
     }
   };
+
+  if (loading || role) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
