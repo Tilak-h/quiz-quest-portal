@@ -9,20 +9,22 @@ const RoleSelection = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(false);
 
-  console.log("[RoleSelection] render:", { loading, hasSession: !!session, role });
+  // If already logged in and not explicitly switching roles, redirect
+  const isSwitching = sessionStorage.getItem("switching_role") === "true";
+  
+  console.log("[RoleSelection] render:", { loading, hasSession: !!session, role, isSwitching });
 
   useEffect(() => {
     if (loading) return;
-    console.log("[RoleSelection] useEffect:", { hasSession: !!session, role });
-    if (session && role) {
+    if (session && role && !isSwitching) {
       navigate("/dashboard", { replace: true });
-    } else if (session && !role) {
+    } else if (session && !role && !isSwitching) {
       navigate("/login", { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, session, role]);
 
-  if (loading || session) {
+  if (loading || (session && !isSwitching)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
