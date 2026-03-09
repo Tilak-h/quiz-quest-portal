@@ -181,7 +181,7 @@ const Dashboard = () => {
               </Button>
             </div>
 
-            {quizzes.length === 0 ? (
+          {quizzes.length === 0 ? (
               <div className="rounded-xl border bg-card p-12 text-center">
                 <p className="text-muted-foreground">
                   You haven't created any quizzes yet.
@@ -219,6 +219,13 @@ const Dashboard = () => {
                         </div>
                       )}
                     </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" size="sm" asChild className="w-full gap-2">
+                        <Link to={`/admin/quiz/${quiz.id}`}>
+                          <Users className="h-4 w-4" /> View Results
+                        </Link>
+                      </Button>
+                    </CardFooter>
                   </Card>
                 ))}
               </div>
