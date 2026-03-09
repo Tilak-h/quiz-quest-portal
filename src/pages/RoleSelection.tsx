@@ -34,9 +34,17 @@ const RoleSelection = () => {
 
   const handleSelectRole = (selectedRole: "admin" | "user") => {
     setSelected(true);
-    sessionStorage.setItem("pending_role", selectedRole);
+    sessionStorage.removeItem("switching_role");
     sessionStorage.setItem("active_role", selectedRole);
-    navigate("/login");
+    
+    if (session) {
+      // Already logged in — just switch role and go to dashboard
+      sessionStorage.setItem("pending_role", selectedRole);
+      window.location.href = "/dashboard";
+    } else {
+      sessionStorage.setItem("pending_role", selectedRole);
+      navigate("/login");
+    }
   };
 
   return (
