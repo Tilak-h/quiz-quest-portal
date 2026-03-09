@@ -110,6 +110,18 @@ const Dashboard = () => {
   const getAttemptForQuiz = (quizId: string) =>
     attempts.find((a) => a.quiz_id === quizId);
 
+  const handleDeleteQuiz = async (quizId: string) => {
+    try {
+      // Delete questions first, then the quiz
+      await supabase.from("questions").delete().eq("quiz_id", quizId);
+      const { error } = await supabase.from("quizzes").delete().eq("id", quizId);
+      if (error) throw error;
+      setQuizzes((prev) => prev.filter((q) => q.id !== quizId));
+      toast.success("Quiz deleted successfully");
+    } catch {
+      toast.error("Failed to delete quiz");
+    }
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
