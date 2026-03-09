@@ -95,7 +95,7 @@ const AdminQuizResults = () => {
   }, [id]);
 
   if (authLoading) return null;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   if (loading) {
     return (
