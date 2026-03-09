@@ -44,7 +44,7 @@ const EditQuiz = () => {
 
         const quiz = quizRes.data;
         if (quiz.created_by !== user?.id) {
-          navigate("/");
+          navigate("/dashboard");
           return;
         }
 
