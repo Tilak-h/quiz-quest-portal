@@ -81,6 +81,7 @@ const AdminPage = () => {
         .insert({
           title,
           description,
+          category,
           time_limit: timeLimit,
           created_by: user!.id,
         })
