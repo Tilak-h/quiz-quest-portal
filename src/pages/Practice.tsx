@@ -47,7 +47,7 @@ const PracticePage = () => {
         setResults(new Array(questionsRes.data.length).fill(null));
       } catch {
         toast.error("Failed to load quiz");
-        navigate("/");
+        navigate("/dashboard");
       } finally {
         setLoading(false);
       }
