@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, TrendingUp, Target, BarChart3 } from "lucide-react";
+import { Loader2, TrendingUp, Target, BarChart3, Users } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 interface Attempt {
@@ -11,6 +11,7 @@ interface Attempt {
   quiz_id: string;
   score: number;
   submitted_at: string;
+  user_id: string;
 }
 
 interface Quiz {
@@ -22,7 +23,7 @@ interface Quiz {
 const COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "hsl(var(--accent))", "#fbbf24", "#34d399", "#a78bfa"];
 
 const Analytics = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,16 +31,37 @@ const Analytics = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
-      const [attRes, quizRes] = await Promise.all([
-        supabase.from("attempts").select("*").eq("user_id", user.id).order("submitted_at", { ascending: true }),
-        supabase.from("quizzes").select("id, title, category"),
-      ]);
-      if (attRes.data) setAttempts(attRes.data);
-      if (quizRes.data) setQuizzes(quizRes.data);
+
+      if (isAdmin) {
+        // Admin: fetch their quizzes and all attempts on those quizzes
+        const { data: myQuizzes } = await supabase
+          .from("quizzes")
+          .select("id, title, category")
+          .eq("created_by", user.id);
+
+        if (myQuizzes && myQuizzes.length > 0) {
+          setQuizzes(myQuizzes);
+          const quizIds = myQuizzes.map((q) => q.id);
+          const { data: attData } = await supabase
+            .from("attempts")
+            .select("*")
+            .in("quiz_id", quizIds)
+            .order("submitted_at", { ascending: true });
+          if (attData) setAttempts(attData);
+        }
+      } else {
+        // Student: personal analytics
+        const [attRes, quizRes] = await Promise.all([
+          supabase.from("attempts").select("*").eq("user_id", user.id).order("submitted_at", { ascending: true }),
+          supabase.from("quizzes").select("id, title, category"),
+        ]);
+        if (attRes.data) setAttempts(attRes.data);
+        if (quizRes.data) setQuizzes(quizRes.data);
+      }
       setLoading(false);
     };
     fetchData();
-  }, [user]);
+  }, [user, isAdmin]);
 
   if (loading) {
     return (
@@ -57,6 +79,7 @@ const Analytics = () => {
     : 0;
 
   const bestScore = attempts.length ? Math.max(...attempts.map((a) => a.score)) : 0;
+  const uniqueStudents = new Set(attempts.map((a) => a.user_id)).size;
 
   // Score trend over time
   const trendData = attempts.map((a, i) => ({
@@ -65,7 +88,7 @@ const Analytics = () => {
     date: new Date(a.submitted_at).toLocaleDateString(),
   }));
 
-  // Per-quiz best scores
+  // Per-quiz scores
   const quizScores = quizzes
     .map((q) => {
       const quizAttempts = attempts.filter((a) => a.quiz_id === q.id);
@@ -73,10 +96,11 @@ const Analytics = () => {
       return {
         name: q.title.length > 15 ? q.title.slice(0, 15) + "…" : q.title,
         best: Math.max(...quizAttempts.map((a) => a.score)),
+        avg: Math.round(quizAttempts.reduce((s, a) => s + a.score, 0) / quizAttempts.length),
         attempts: quizAttempts.length,
       };
     })
-    .filter(Boolean) as { name: string; best: number; attempts: number }[];
+    .filter(Boolean) as { name: string; best: number; avg: number; attempts: number }[];
 
   // Category distribution
   const categoryData = quizzes.reduce<Record<string, number>>((acc, q) => {
@@ -96,19 +120,28 @@ const Analytics = () => {
       <main className="mx-auto max-w-5xl px-4 py-8">
         <h1 className="mb-8 font-heading text-3xl font-bold text-foreground flex items-center gap-3">
           <BarChart3 className="h-8 w-8 text-primary" />
-          Analytics
+          {isAdmin ? "Quiz Analytics" : "My Analytics"}
         </h1>
 
         {attempts.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
-              No quiz attempts yet. Take a quiz to see your analytics!
+              {isAdmin ? "No students have taken your quizzes yet." : "No quiz attempts yet. Take a quiz to see your analytics!"}
             </CardContent>
           </Card>
         ) : (
           <>
             {/* Summary Cards */}
-            <div className="mb-8 grid gap-4 sm:grid-cols-3">
+            <div className={`mb-8 grid gap-4 ${isAdmin ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
+              {isAdmin && (
+                <Card>
+                  <CardContent className="pt-6 text-center">
+                    <Users className="mx-auto mb-2 h-8 w-8 text-primary" />
+                    <p className="font-heading text-3xl font-bold text-foreground">{uniqueStudents}</p>
+                    <p className="text-sm text-muted-foreground">Total Students</p>
+                  </CardContent>
+                </Card>
+              )}
               <Card>
                 <CardContent className="pt-6 text-center">
                   <Target className="mx-auto mb-2 h-8 w-8 text-primary" />
@@ -135,7 +168,7 @@ const Analytics = () => {
             {/* Score Trend */}
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle className="font-heading">Score Trend</CardTitle>
+                <CardTitle className="font-heading">{isAdmin ? "Score Distribution Over Time" : "Score Trend"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-64">
@@ -166,11 +199,10 @@ const Analytics = () => {
             </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Best Scores Per Quiz */}
               {quizScores.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="font-heading">Best Scores by Quiz</CardTitle>
+                    <CardTitle className="font-heading">{isAdmin ? "Average Scores by Quiz" : "Best Scores by Quiz"}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="h-64">
@@ -187,7 +219,7 @@ const Analytics = () => {
                               color: "hsl(var(--foreground))",
                             }}
                           />
-                          <Bar dataKey="best" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey={isAdmin ? "avg" : "best"} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -195,7 +227,6 @@ const Analytics = () => {
                 </Card>
               )}
 
-              {/* Category Distribution */}
               {pieData.length > 0 && (
                 <Card>
                   <CardHeader>
