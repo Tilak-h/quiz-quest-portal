@@ -18,7 +18,7 @@ const RoleSelection = () => {
     }
   }, [loading, session, role, navigate]);
 
-  if (loading || (session && (role || !role))) {
+  if (loading || session) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
