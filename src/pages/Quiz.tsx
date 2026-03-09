@@ -54,7 +54,7 @@ const QuizPage = () => {
         setTimeLeft(quizRes.data.time_limit * 60);
       } catch {
         toast.error("Failed to load quiz");
-        navigate("/");
+        navigate("/dashboard");
       } finally {
         setLoading(false);
       }

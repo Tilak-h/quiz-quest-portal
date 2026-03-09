@@ -160,7 +160,7 @@ const AdminPage = () => {
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={() => navigate("/")}>
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
                 Go to Dashboard
               </Button>
               <Button onClick={() => {

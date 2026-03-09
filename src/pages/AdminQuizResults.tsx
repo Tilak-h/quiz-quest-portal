@@ -122,7 +122,7 @@ const AdminQuizResults = () => {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8">
         <Button variant="ghost" size="sm" asChild className="mb-4 gap-1">
-          <Link to="/"><ArrowLeft className="h-4 w-4" /> Back to Dashboard</Link>
+          <Link to="/dashboard"><ArrowLeft className="h-4 w-4" /> Back to Dashboard</Link>
         </Button>
 
         {/* Quiz Header */}

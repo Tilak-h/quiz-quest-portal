@@ -166,7 +166,7 @@ const EditQuiz = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="mb-4 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4 gap-1">
           <ArrowLeft className="h-4 w-4" /> Back to Dashboard
         </Button>
 
