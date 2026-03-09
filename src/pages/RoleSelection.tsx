@@ -9,8 +9,11 @@ const RoleSelection = () => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(false);
 
+  console.log("[RoleSelection] render:", { loading, hasSession: !!session, role });
+
   useEffect(() => {
     if (loading) return;
+    console.log("[RoleSelection] useEffect:", { hasSession: !!session, role });
     if (session && role) {
       navigate("/dashboard", { replace: true });
     } else if (session && !role) {
