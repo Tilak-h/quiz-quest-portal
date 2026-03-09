@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Loader2, Save } from "lucide-react";
+import { AIQuizGenerator } from "@/components/AIQuizGenerator";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
 
@@ -203,10 +204,21 @@ const AdminPage = () => {
             </Card>
           ))}
 
-          <div className="flex items-center justify-between">
-            <Button variant="outline" onClick={addQuestion} className="gap-2">
-              <Plus className="h-4 w-4" /> Add Question
-            </Button>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={addQuestion} className="gap-2">
+                <Plus className="h-4 w-4" /> Add Question
+              </Button>
+              <AIQuizGenerator
+                onGenerated={(generated) =>
+                  setQuestions(generated.map((q) => ({
+                    question_text: q.question_text,
+                    options: q.options.slice(0, 4),
+                    correct_answer_index: q.correct_answer_index,
+                  })))
+                }
+              />
+            </div>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save Quiz
