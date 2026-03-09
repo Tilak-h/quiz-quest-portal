@@ -14,6 +14,7 @@ import PracticePage from "./pages/Practice";
 import ResultPage from "./pages/Result";
 import AdminPage from "./pages/Admin";
 import AdminQuizResults from "./pages/AdminQuizResults";
+import EditQuiz from "./pages/EditQuiz";
 import Leaderboard from "./pages/Leaderboard";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";

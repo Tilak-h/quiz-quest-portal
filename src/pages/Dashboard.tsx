@@ -232,12 +232,41 @@ const Dashboard = () => {
                         </div>
                       )}
                     </CardContent>
-                    <CardFooter>
-                      <Button variant="outline" size="sm" asChild className="w-full gap-2">
+                    <CardFooter className="flex gap-2">
+                      <Button variant="outline" size="sm" asChild className="flex-1 gap-1">
                         <Link to={`/admin/quiz/${quiz.id}`}>
-                          <Users className="h-4 w-4" /> View Results
+                          <Users className="h-4 w-4" /> Results
                         </Link>
                       </Button>
+                      <Button variant="outline" size="sm" asChild className="gap-1">
+                        <Link to={`/admin/edit/${quiz.id}`}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete "{quiz.title}"?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the quiz and all its questions. Student attempts will remain but won't be linked to this quiz. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteQuiz(quiz.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </CardFooter>
                   </Card>
                 ))}
