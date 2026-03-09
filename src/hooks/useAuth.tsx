@@ -50,8 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", userId)
-          .maybeSingle(),
+          .eq("user_id", userId),
       ]);
 
       setProfile(profileRes.data);
