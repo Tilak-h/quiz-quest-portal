@@ -68,32 +68,20 @@ const QuizPage = () => {
     submittedRef.current = true;
     setSubmitting(true);
 
-    const correctCount = questions.reduce(
-      (acc, q, i) => acc + (answers[i] === q.correct_answer_index ? 1 : 0),
-      0
-    );
-    const score = Math.round((correctCount / questions.length) * 100);
-
     try {
-      const { data, error } = await supabase
-        .from("attempts")
-        .insert({
-          quiz_id: quiz.id,
-          user_id: user.id,
-          answers: answers.map((a) => a ?? -1),
-          score,
-        })
-        .select("id")
-        .single();
+      const { data, error } = await supabase.functions.invoke("submit-quiz", {
+        body: { quiz_id: quiz.id, answers },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       navigate(`/result/${data.id}`, { replace: true });
     } catch {
       toast.error("Failed to submit quiz");
       submittedRef.current = false;
       setSubmitting(false);
     }
-  }, [answers, navigate, questions, quiz, user]);
+  }, [answers, navigate, quiz, user]);
 
   // Timer
   useEffect(() => {
