@@ -112,7 +112,7 @@ const Leaderboard = () => {
               key={q.id}
               variant={selectedQuiz === q.id ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedQuiz(q.id)}
+              onClick={() => { setSelectedQuiz(q.id); setPage(1); }}
               className="rounded-full"
             >
               {q.title}
