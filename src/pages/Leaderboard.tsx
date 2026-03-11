@@ -102,7 +102,7 @@ const Leaderboard = () => {
           <Button
             variant={selectedQuiz === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedQuiz("all")}
+            onClick={() => { setSelectedQuiz("all"); setPage(1); }}
             className="rounded-full"
           >
             Global
