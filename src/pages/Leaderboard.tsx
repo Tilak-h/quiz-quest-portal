@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Pagination, paginateItems } from "@/components/Pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
