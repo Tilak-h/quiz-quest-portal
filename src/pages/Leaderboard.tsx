@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Pagination, paginateItems } from "@/components/Pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,6 +24,8 @@ const Leaderboard = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuiz, setSelectedQuiz] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     const fetch = async () => {
@@ -99,7 +102,7 @@ const Leaderboard = () => {
           <Button
             variant={selectedQuiz === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedQuiz("all")}
+            onClick={() => { setSelectedQuiz("all"); setPage(1); }}
             className="rounded-full"
           >
             Global
@@ -109,7 +112,7 @@ const Leaderboard = () => {
               key={q.id}
               variant={selectedQuiz === q.id ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedQuiz(q.id)}
+              onClick={() => { setSelectedQuiz(q.id); setPage(1); }}
               className="rounded-full"
             >
               {q.title}
@@ -124,36 +127,46 @@ const Leaderboard = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {leaderboard.map((entry, index) => (
-              <div
-                key={`${entry.user_id}-${entry.quiz_id}`}
-                className={cn(
-                  "flex items-center gap-4 rounded-xl border bg-card px-4 py-3 transition-colors",
-                  index === 0 && "border-yellow-500/30 bg-yellow-500/5"
-                )}
-              >
-                <div className="flex h-8 w-8 items-center justify-center">
-                  {getRankIcon(index)}
-                </div>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={entry.user_photo ?? ""} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {entry.user_name?.charAt(0)?.toUpperCase() ?? "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">{entry.user_name ?? "Anonymous"}</p>
-                  {selectedQuiz === "all" && (
-                    <p className="text-xs text-muted-foreground">{entry.quiz_title}</p>
-                  )}
-                </div>
-                <div className="text-right">
-                  <span className="font-heading text-xl font-bold text-primary">{entry.score}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="space-y-3">
+              {paginateItems(leaderboard, page, PAGE_SIZE).map((entry, i) => {
+                const index = (page - 1) * PAGE_SIZE + i;
+                return (
+                  <div
+                    key={`${entry.user_id}-${entry.quiz_id}`}
+                    className={cn(
+                      "flex items-center gap-4 rounded-xl border bg-card px-4 py-3 transition-colors",
+                      index === 0 && "border-yellow-500/30 bg-yellow-500/5"
+                    )}
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center">
+                      {getRankIcon(index)}
+                    </div>
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={entry.user_photo ?? ""} />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                        {entry.user_name?.charAt(0)?.toUpperCase() ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{entry.user_name ?? "Anonymous"}</p>
+                      {selectedQuiz === "all" && (
+                        <p className="text-xs text-muted-foreground">{entry.quiz_title}</p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <span className="font-heading text-xl font-bold text-primary">{entry.score}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={Math.ceil(leaderboard.length / PAGE_SIZE)}
+              onPageChange={setPage}
+            />
+          </>
         )}
       </main>
     </div>

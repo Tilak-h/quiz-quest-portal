@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Pagination, paginateItems } from "@/components/Pagination";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,6 +39,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [joinCode, setJoinCode] = useState("");
   const [joining, setJoining] = useState(false);
+  const [quizPage, setQuizPage] = useState(1);
+  const [attemptPage, setAttemptPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -204,73 +208,80 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {quizzes.map((quiz) => (
-                  <Card key={quiz.id} className="flex flex-col">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="font-heading text-lg">{quiz.title}</CardTitle>
-                        <Badge variant="secondary" className="shrink-0 text-xs">
-                          {quiz.category ?? "General"}
-                        </Badge>
-                      </div>
-                      <CardDescription className="line-clamp-2">
-                        {quiz.description ?? "No description"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>{quiz.time_limit} minutes</span>
-                      </div>
-                      {quiz.join_code && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">Code:</span>
-                          <Badge variant="outline" className="font-mono tracking-widest">
-                            {quiz.join_code}
+              <>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {paginateItems(quizzes, quizPage, PAGE_SIZE).map((quiz) => (
+                    <Card key={quiz.id} className="flex flex-col">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="font-heading text-lg">{quiz.title}</CardTitle>
+                          <Badge variant="secondary" className="shrink-0 text-xs">
+                            {quiz.category ?? "General"}
                           </Badge>
                         </div>
-                      )}
-                    </CardContent>
-                    <CardFooter className="flex gap-2">
-                      <Button variant="outline" size="sm" asChild className="flex-1 gap-1">
-                        <Link to={`/admin/quiz/${quiz.id}`}>
-                          <Users className="h-4 w-4" /> Results
-                        </Link>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild className="gap-1">
-                        <Link to={`/admin/edit/${quiz.id}`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete "{quiz.title}"?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete the quiz and all its questions. Student attempts will remain but won't be linked to this quiz. This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteQuiz(quiz.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
+                        <CardDescription className="line-clamp-2">
+                          {quiz.description ?? "No description"}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Clock className="h-4 w-4" />
+                          <span>{quiz.time_limit} minutes</span>
+                        </div>
+                        {quiz.join_code && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">Code:</span>
+                            <Badge variant="outline" className="font-mono tracking-widest">
+                              {quiz.join_code}
+                            </Badge>
+                          </div>
+                        )}
+                      </CardContent>
+                      <CardFooter className="flex gap-2">
+                        <Button variant="outline" size="sm" asChild className="flex-1 gap-1">
+                          <Link to={`/admin/quiz/${quiz.id}`}>
+                            <Users className="h-4 w-4" /> Results
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild className="gap-1">
+                          <Link to={`/admin/edit/${quiz.id}`}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete "{quiz.title}"?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete the quiz and all its questions. Student attempts will remain but won't be linked to this quiz. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteQuiz(quiz.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+                <Pagination
+                  currentPage={quizPage}
+                  totalPages={Math.ceil(quizzes.length / PAGE_SIZE)}
+                  onPageChange={setQuizPage}
+                />
+              </>
             )}
           </>
         )}
@@ -282,7 +293,7 @@ const Dashboard = () => {
               Your Attempts
             </h3>
             <div className="space-y-3">
-              {attempts.map((attempt) => {
+              {paginateItems(attempts, attemptPage, PAGE_SIZE).map((attempt) => {
                 const quiz = quizzes.find((q) => q.id === attempt.quiz_id);
                 return (
                   <div
@@ -309,6 +320,11 @@ const Dashboard = () => {
                 );
               })}
             </div>
+            <Pagination
+              currentPage={attemptPage}
+              totalPages={Math.ceil(attempts.length / PAGE_SIZE)}
+              onPageChange={setAttemptPage}
+            />
           </div>
         )}
 
