@@ -39,6 +39,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [joinCode, setJoinCode] = useState("");
   const [joining, setJoining] = useState(false);
+  const [quizPage, setQuizPage] = useState(1);
+  const [attemptPage, setAttemptPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   useEffect(() => {
     const fetchData = async () => {
