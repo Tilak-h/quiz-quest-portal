@@ -24,6 +24,8 @@ const Leaderboard = () => {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuiz, setSelectedQuiz] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     const fetch = async () => {
