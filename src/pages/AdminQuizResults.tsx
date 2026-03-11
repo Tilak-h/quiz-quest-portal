@@ -180,80 +180,89 @@ const AdminQuizResults = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {attempts.map((attempt, index) => (
-              <div key={attempt.id}>
-                <div
-                  className={cn(
-                    "flex items-center gap-4 rounded-xl border bg-card px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50",
-                    selectedAttempt === attempt.id && "border-primary ring-1 ring-primary"
-                  )}
-                  onClick={() => setSelectedAttempt(selectedAttempt === attempt.id ? null : attempt.id)}
-                >
-                  <span className="flex h-8 w-8 items-center justify-center text-sm font-bold text-muted-foreground">
-                    #{index + 1}
-                  </span>
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={attempt.profile?.photo_url ?? ""} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                      {attempt.profile?.name?.charAt(0)?.toUpperCase() ?? "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{attempt.profile?.name ?? "Unknown"}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {attempt.profile?.email} · {new Date(attempt.submitted_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={cn(
-                      "font-heading text-xl font-bold",
-                      attempt.score >= 70 ? "text-primary" : attempt.score >= 40 ? "text-yellow-500" : "text-destructive"
-                    )}>
-                      {attempt.score}%
-                    </span>
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
+          <>
+            <div className="space-y-3">
+              {paginateItems(attempts, page, PAGE_SIZE).map((attempt, i) => {
+                const index = (page - 1) * PAGE_SIZE + i;
+                return (
+                  <div key={attempt.id}>
+                    <div
+                      className={cn(
+                        "flex items-center gap-4 rounded-xl border bg-card px-4 py-3 cursor-pointer transition-colors hover:bg-accent/50",
+                        selectedAttempt === attempt.id && "border-primary ring-1 ring-primary"
+                      )}
+                      onClick={() => setSelectedAttempt(selectedAttempt === attempt.id ? null : attempt.id)}
+                    >
+                      <span className="flex h-8 w-8 items-center justify-center text-sm font-bold text-muted-foreground">
+                        #{index + 1}
+                      </span>
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={attempt.profile?.photo_url ?? ""} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                          {attempt.profile?.name?.charAt(0)?.toUpperCase() ?? "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{attempt.profile?.name ?? "Unknown"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {attempt.profile?.email} · {new Date(attempt.submitted_at).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={cn(
+                          "font-heading text-xl font-bold",
+                          attempt.score >= 70 ? "text-primary" : attempt.score >= 40 ? "text-yellow-500" : "text-destructive"
+                        )}>
+                          {attempt.score}%
+                        </span>
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
 
-                {/* Expanded answer review */}
-                {selectedAttempt === attempt.id && selectedAttemptData && (
-                  <div className="mt-2 ml-12 space-y-3 pb-2">
-                    {questions.map((q, qi) => {
-                      const userAnswer = selectedAttemptData.answers[qi];
-                      const isCorrect = userAnswer === q.correct_answer_index;
-                      return (
-                        <div key={q.id} className="rounded-lg border bg-card p-4">
-                          <div className="flex items-start gap-2 mb-2">
-                            <span className={cn(
-                              "mt-0.5 text-sm font-bold",
-                              isCorrect ? "text-primary" : "text-destructive"
-                            )}>
-                              {isCorrect ? "✓" : "✗"}
-                            </span>
-                            <p className="text-sm font-medium text-foreground">{q.question_text}</p>
-                          </div>
-                          <div className="ml-5 space-y-1">
-                            {q.options.map((opt, oi) => (
-                              <p key={oi} className={cn(
-                                "text-xs",
-                                oi === q.correct_answer_index ? "text-primary font-medium" : 
-                                oi === userAnswer && !isCorrect ? "text-destructive" : "text-muted-foreground"
-                              )}>
-                                {String.fromCharCode(65 + oi)}. {opt}
-                                {oi === q.correct_answer_index && " ✓"}
-                                {oi === userAnswer && !isCorrect && " (student's answer)"}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {selectedAttempt === attempt.id && selectedAttemptData && (
+                      <div className="mt-2 ml-12 space-y-3 pb-2">
+                        {questions.map((q, qi) => {
+                          const userAnswer = selectedAttemptData.answers[qi];
+                          const isCorrect = userAnswer === q.correct_answer_index;
+                          return (
+                            <div key={q.id} className="rounded-lg border bg-card p-4">
+                              <div className="flex items-start gap-2 mb-2">
+                                <span className={cn(
+                                  "mt-0.5 text-sm font-bold",
+                                  isCorrect ? "text-primary" : "text-destructive"
+                                )}>
+                                  {isCorrect ? "✓" : "✗"}
+                                </span>
+                                <p className="text-sm font-medium text-foreground">{q.question_text}</p>
+                              </div>
+                              <div className="ml-5 space-y-1">
+                                {q.options.map((opt, oi) => (
+                                  <p key={oi} className={cn(
+                                    "text-xs",
+                                    oi === q.correct_answer_index ? "text-primary font-medium" : 
+                                    oi === userAnswer && !isCorrect ? "text-destructive" : "text-muted-foreground"
+                                  )}>
+                                    {String.fromCharCode(65 + oi)}. {opt}
+                                    {oi === q.correct_answer_index && " ✓"}
+                                    {oi === userAnswer && !isCorrect && " (student's answer)"}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={Math.ceil(attempts.length / PAGE_SIZE)}
+              onPageChange={setPage}
+            />
+          </>
         )}
       </main>
     </div>

@@ -293,7 +293,7 @@ const Dashboard = () => {
               Your Attempts
             </h3>
             <div className="space-y-3">
-              {attempts.map((attempt) => {
+              {paginateItems(attempts, attemptPage, PAGE_SIZE).map((attempt) => {
                 const quiz = quizzes.find((q) => q.id === attempt.quiz_id);
                 return (
                   <div
@@ -320,6 +320,11 @@ const Dashboard = () => {
                 );
               })}
             </div>
+            <Pagination
+              currentPage={attemptPage}
+              totalPages={Math.ceil(attempts.length / PAGE_SIZE)}
+              onPageChange={setAttemptPage}
+            />
           </div>
         )}
 
