@@ -59,41 +59,27 @@ const RoleSelection = () => {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex justify-center">
           <Card
-            className="cursor-pointer border-2 transition-all hover:border-primary hover:shadow-md"
-            onClick={() => !selected && handleSelectRole("admin")}
-          >
-            <CardHeader className="items-center pb-2">
-              <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                <Shield className="h-7 w-7 text-primary" />
-              </div>
-              <CardTitle className="font-heading text-lg">Admin</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-center">
-                Create quizzes, manage questions, and share unique codes with your students
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="cursor-pointer border-2 transition-all hover:border-primary hover:shadow-md"
+            className="w-full max-w-xs cursor-pointer border-2 transition-all hover:border-primary hover:shadow-md"
             onClick={() => !selected && handleSelectRole("user")}
           >
             <CardHeader className="items-center pb-2">
               <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-accent">
                 <User className="h-7 w-7 text-accent-foreground" />
               </div>
-              <CardTitle className="font-heading text-lg">Student</CardTitle>
+              <CardTitle className="font-heading text-lg">Get Started</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-center">
-                Enter a quiz code to take tests, practice, and track your progress
+                Sign in to take quizzes, practice, and track your progress
               </CardDescription>
             </CardContent>
           </Card>
         </div>
+        <p className="text-xs text-muted-foreground">
+          Admin access is granted by existing administrators.
+        </p>
       </div>
     </div>
   );
