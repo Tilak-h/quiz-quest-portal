@@ -14,7 +14,6 @@ interface Question {
   id: string;
   question_text: string;
   options: string[];
-  correct_answer_index: number;
 }
 
 interface QuizData {
