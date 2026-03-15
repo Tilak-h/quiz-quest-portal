@@ -32,15 +32,17 @@ const Login = () => {
       if (pendingRole && !assigningRole) {
         setAssigningRole(true);
         try {
-          const { error } = await supabase
-            .from("user_roles")
-            .insert({ user_id: user.id, role: pendingRole });
+          // Always assign 'user' role via secure server-side function
+          const { error } = await supabase.rpc("assign_user_role", {
+            _user_id: user.id,
+          });
 
-          if (error && error.code !== "23505") throw error;
+          if (error) throw error;
 
+          const assignedRole = "user";
           sessionStorage.removeItem("pending_role");
-          sessionStorage.setItem("active_role", pendingRole);
-          toast.success(`Signed in as ${pendingRole === "admin" ? "Admin" : "Student"}`);
+          sessionStorage.setItem("active_role", assignedRole);
+          toast.success("Signed in as Student");
           window.location.href = "/dashboard";
         } catch {
           toast.error("Failed to set role. Please try again.");
