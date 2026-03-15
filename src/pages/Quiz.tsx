@@ -14,7 +14,6 @@ interface Question {
   id: string;
   question_text: string;
   options: string[];
-  correct_answer_index: number;
 }
 
 interface QuizData {
@@ -42,7 +41,7 @@ const QuizPage = () => {
       try {
         const [quizRes, questionsRes] = await Promise.all([
           supabase.from("quizzes").select("id, title, time_limit").eq("id", id!).single(),
-          supabase.from("questions").select("*").eq("quiz_id", id!),
+          supabase.rpc("get_quiz_questions_safe", { _quiz_id: id! }),
         ]);
 
         if (quizRes.error) throw quizRes.error;
