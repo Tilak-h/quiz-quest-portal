@@ -37,7 +37,7 @@ const PracticePage = () => {
       try {
         const [quizRes, questionsRes] = await Promise.all([
           supabase.from("quizzes").select("id, title").eq("id", id!).single(),
-          supabase.from("questions").select("*").eq("quiz_id", id!),
+          supabase.rpc("get_quiz_questions_full", { _quiz_id: id! }),
         ]);
         if (quizRes.error) throw quizRes.error;
         if (questionsRes.error) throw questionsRes.error;
