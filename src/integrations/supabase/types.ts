@@ -192,6 +192,27 @@ export type Database = {
         Returns: undefined
       }
       assign_user_role: { Args: { _user_id: string }; Returns: undefined }
+      get_quiz_questions_full: {
+        Args: { _quiz_id: string }
+        Returns: {
+          correct_answer_index: number
+          created_at: string
+          id: string
+          options: string[]
+          question_text: string
+          quiz_id: string
+        }[]
+      }
+      get_quiz_questions_safe: {
+        Args: { _quiz_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          options: string[]
+          question_text: string
+          quiz_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
